@@ -7,7 +7,7 @@ import * as userController from './controllers/userController.js';
 import * as postController from './controllers/postController.js'
 
 mongoose
-    .connect('mongodb+srv://YevhenRight:Hunter15021984@cluster0.uwwhu0y.mongodb.net/blog?retryWrites=true&w=majority')
+    .connect(process.env.MONGODB_URI)
     .then(() => console.log("DB ok"))
     .catch((err) => console.log('DB err', err))
 
@@ -48,7 +48,7 @@ app.get('/posts/:id', postController.getOne);
 app.patch('/posts/:id', checkAuth, postController.update);
 app.delete('/posts/:id', checkAuth, postController.remove);
 
-app.listen(4444, (err) => {
+app.listen( process.env.PORT || 4444, (err) => {
     if (err) {
         return console.log(err)
     }
