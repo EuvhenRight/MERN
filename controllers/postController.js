@@ -1,11 +1,27 @@
 import PostModel from '../module/post.js'
 
+export const getLastTags = async (req, res) => {
+    try {
+        const post = await PostModel.find().limit(5).exec(); // TODO it is string need read
+
+        const tags = post.map((obj)=>obj.tags).flat().slice(0,5);
+
+        res.json(tags);
+
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({
+            message: "Tags is failed"
+        })
+    }
+}
+
 
 export const getAll = async (req, res) => {
     try {
-        const post = await PostModel.find().populate('user').exec(); // TODO it is string need read
+        const posts = await PostModel.find().populate('user').exec(); // TODO it is string need read
 
-        res.json(post);
+        res.json(posts);
 
     } catch (err) {
         console.log(err);
@@ -24,7 +40,7 @@ export const getOne = async (req, res) => { //TODO need read this strict
                 _id: postId,
             },
             {
-                $inc: {viewCount: 1},
+                $inc: {viewsCount: 1},
             },
             {
                 returnDocument: "after",
@@ -39,11 +55,11 @@ export const getOne = async (req, res) => { //TODO need read this strict
                 if (!doc) {
                     res.status(404).json({
                         message: "Post not found",
-                    })
+                    });
                 }
                 res.json(doc)
             },
-        );
+        ).populate('user');
 
     } catch (err) {
         console.log(err);
@@ -57,9 +73,9 @@ export const update = async (req, res) => {
     try {
         const postId = req.params.id;
 
-       await PostModel.updateOne({ // TODO need read about await
-            _id: postId,
-        }, {
+        await PostModel.updateOne({ // TODO need read about await
+                _id: postId,
+            }, {
                 title: req.body.title,
                 text: req.body.text,
                 tags: req.body.tags,
@@ -69,7 +85,7 @@ export const update = async (req, res) => {
             res.json({
                 success: true,
             })
-            )
+        )
 
     } catch (err) {
         console.log(err);
@@ -114,7 +130,7 @@ export const create = async (req, res) => {
         const doc = new PostModel({
             title: req.body.title,
             text: req.body.text,
-            tags: req.body.tags,
+            tags: req.body.tags.split(','),
             user: req.userId,
             imageUrl: req.body.imageUrl,
         })

@@ -16,7 +16,7 @@ const app = express();
 
 const storage = multer.diskStorage({
     destination: (_, __, cb) => {
-        cb(null, "uploads")
+        cb(null, "upload")
     },
     filename: (_, file, cb) => {
         cb(null, file.originalname)
@@ -27,7 +27,7 @@ const  upload = multer({storage});
 
 
 app.use(express.json());
-app.use('/uploads', express.static('uploads')); //TODO important strict
+app.use('/upload', express.static('upload')); //TODO important strict
 
 app.get('/', (req, res) => {
     res.send('Hello world!!!')
@@ -36,11 +36,13 @@ app.post('/auth/login', loginValidation, userController.login);
 app.post('/auth/register', registerValidation, userController.register);
 app.post('/upload', checkAuth, upload.single('image'), (req, res) => {
     res.json({
-        url: `/uploads/${req.file.originalname}`,
+        url: `/upload/${req.file.originalname}`,
     })
 });
+app.get('/tags', postController.getLastTags);
 app.get('/auth/me', checkAuth, userController.userMe);
 app.post('/posts', checkAuth, postCreateValidation, postController.create);
+app.get('/posts/tags', postController.getLastTags);
 app.get('/posts', postController.getAll);
 app.get('/posts/:id', postController.getOne);
 app.patch('/posts/:id', checkAuth, postController.update);
