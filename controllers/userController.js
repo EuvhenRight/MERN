@@ -1,5 +1,5 @@
 import UserModel from "../module/user.js";
-import bcryptjs from "bcryptjs";
+import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import {validationResult} from "express-validator";
 
@@ -12,8 +12,8 @@ export const register = async (req, res) => {
         }
 
         const password = req.body.password.toString();
-        const salt = await bcryptjs.genSalt(10); //code password
-        const hash = await bcryptjs.hash(password, salt); //code password
+        const salt = await bcrypt.genSalt(10); //code password
+        const hash = await bcrypt.hash(password, salt); //code password
 
 
         const doc = new UserModel({
@@ -55,7 +55,7 @@ export const login = async (req, res) => {
                 message: 'Error, user not found'
             })
         }
-        const isValidPass = await bcryptjs.compareSync(req.body.password, user._doc.passwordHash) // only string
+        const isValidPass = await bcrypt.compareSync(req.body.password, user._doc.passwordHash) // only string
 
         if (!isValidPass) {
             return res.status(403).json({
